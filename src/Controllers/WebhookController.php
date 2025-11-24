@@ -13,6 +13,7 @@ use PaypalServerSdkLib\Exceptions\ErrorException;
 use PaypalServerSdkLib\Http\ApiResponse;
 use PaypalServerSdkLib\Models\Webhook;
 use PaypalServerSdkLib\Models\WebhooksEventTypeListResponse;
+use PaypalServerSdkLib\Models\WebhookSimulateRequest;
 use PaypalServerSdkLib\Models\WebhooksListResponse;
 
 class WebhookController extends BaseController
@@ -151,6 +152,45 @@ class WebhookController extends BaseController
                 ErrorType::init('Authorization failed due to insufficient permissions.', ErrorException::class)
             )
             ->throwErrorOn('500', ErrorType::init('An internal server error has occurred.', ErrorException::class))
+            ->returnApiResponse();
+
+        return $this->execute($requestBuilder, $responseHandler);
+    }
+
+    public function simulateWebhook(array $options)
+    {
+        $requestBuilder = $this->requestBuilder(RequestMethod::POST, '/v1/notifications/simulate-event')
+            ->auth('Oauth2')
+            ->parameters(
+                HeaderParam::init('Content-Type', 'application/json'),
+                BodyParam::init($options)->extract('body')
+            );
+
+        $responseHandler = $this->responseHandler()
+            ->throwErrorOn(
+                '400',
+                ErrorType::init(
+                    'Request is not well-formed, syntactically incorrect, or violates schema.',
+                    ErrorException::class
+                )
+            )
+            ->throwErrorOn(
+                '401',
+                ErrorType::init(
+                    'Authentication failed due to missing authorization header, or invalid auth' .
+                    'entication credentials.',
+                    ErrorException::class
+                )
+            )
+            ->throwErrorOn(
+                '422',
+                ErrorType::init(
+                    'The requested action could not be performed, semantically incorrect, or fa' .
+                    'iled business validation.',
+                    ErrorException::class
+                )
+            )
+            ->throwErrorOn('0', ErrorType::init('The error response.', ErrorException::class))
             ->returnApiResponse();
 
         return $this->execute($requestBuilder, $responseHandler);
