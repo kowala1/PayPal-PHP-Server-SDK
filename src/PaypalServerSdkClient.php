@@ -18,6 +18,7 @@ use PaypalServerSdkLib\Controllers\OAuthAuthorizationController;
 use PaypalServerSdkLib\Controllers\OrdersController;
 use PaypalServerSdkLib\Controllers\PaymentsController;
 use PaypalServerSdkLib\Controllers\VaultController;
+use PaypalServerSdkLib\Controllers\WebhookController;
 use PaypalServerSdkLib\Logging\LoggingConfigurationBuilder;
 use PaypalServerSdkLib\Logging\RequestLoggingConfigurationBuilder;
 use PaypalServerSdkLib\Logging\ResponseLoggingConfigurationBuilder;
@@ -33,6 +34,8 @@ class PaypalServerSdkClient implements ConfigurationInterface
     private $payments;
 
     private $vault;
+
+    private ?WebhookController $webhook = null;
 
     private $oAuthAuthorization;
 
@@ -277,6 +280,11 @@ class PaypalServerSdkClient implements ConfigurationInterface
             $this->vault = new VaultController($this->client);
         }
         return $this->vault;
+    }
+
+    public function getWebhookController(): WebhookController
+    {
+        return $this->webhook ??= new WebhookController($this->client);
     }
 
     /**
