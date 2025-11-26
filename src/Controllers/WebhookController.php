@@ -91,7 +91,7 @@ class WebhookController extends BaseController
 
     public function createWebhook(array $options = [])
     {
-        $requestBuilder = $this->requestBuilder(RequestMethod::GET, '/v1/notifications/webhooks')
+        $requestBuilder = $this->requestBuilder(RequestMethod::POST, '/v1/notifications/webhooks')
             ->auth('Oauth2')
             ->parameters(
                 HeaderParam::init('Content-Type', 'application/json'),
